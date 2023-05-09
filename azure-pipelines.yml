@@ -34,3 +34,4 @@ stages:
       inputs:
         artifactName: 'html_artifact'
         publishLocation: 'pipeline'
+
