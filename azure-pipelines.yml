@@ -16,12 +16,6 @@
 #     includeRootFolder: false
 # - task: PublishBuildArtifacts@1
 
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
 stages:
 - stage: Build
   jobs:
@@ -30,7 +24,7 @@ stages:
     steps:
     - script: |
         mkdir -p $(Build.ArtifactStagingDirectory)/project_files
-        cp -r $(Build.SourcesDirectory)/project_files/* $(Build.ArtifactStagingDirectory)/project_files/
+        cp -r $(Build.SourcesDirectory)/project_files/. $(Build.ArtifactStagingDirectory)/project_files/
       displayName: 'Copy project files'
     - task: ArchiveFiles@2
       inputs:
@@ -40,4 +34,3 @@ stages:
       inputs:
         artifactName: 'html_artifact'
         publishLocation: 'pipeline'
-
