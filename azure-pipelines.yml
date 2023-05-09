@@ -3,15 +3,41 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
+# trigger:
+# - main
+
+# pool:
+#   vmImage: ubuntu-latest
+
+# steps:
+# - task: ArchiveFiles@2
+#   inputs:
+#     rootFolderOrFile: '$(build.sourcesDirectory)'
+#     includeRootFolder: false
+# - task: PublishBuildArtifacts@1
+
 trigger:
 - main
 
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: '$(build.sourcesDirectory)'
-    includeRootFolder: false
-- task: PublishBuildArtifacts@1
+stages:
+- stage: Build
+  jobs:
+  - job: BuildJob
+    displayName: 'Build'
+    steps:
+    - script: |
+        mkdir -p $(Build.ArtifactStagingDirectory)/project_files
+        cp -r $(Build.SourcesDirectory)/project_files/* $(Build.ArtifactStagingDirectory)/project_files/
+      displayName: 'Copy project files'
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
+        includeRootFolder: true
+    - task: PublishBuildArtifacts@1
+      inputs:
+        artifactName: 'html_artifact'
+        publishLocation: 'pipeline'
+
