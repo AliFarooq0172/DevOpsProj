@@ -23,7 +23,7 @@ stages:
     displayName: 'Build'
     steps:
     - script: |
-        mkdir -p $(Build.ArtifactStagingDirectory)/project_files
+        mkdir -p https://github.com/AliFarooq0172/DevOpsProj/project_files
         cp -r https://github.com/AliFarooq0172/DevOpsProj/project_files/
       displayName: 'Copy project files'
     - task: ArchiveFiles@2
