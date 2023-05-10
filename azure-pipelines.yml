@@ -112,11 +112,12 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: ManualIntervention@1
+          - task: ManualIntervention@8
             displayName: 'Request Approval'
             inputs:
               instructions: 'Please approve this deployment.'
-              timeoutInMinutes: 1440 # 24 hours
-              notifyUsers: |
+              timeoutInMinutes: 60
+              onTimeout: reject
+              emailRecipients: |
                 k190172@nu.edu.pk
                 k190145@nu.edu.pk
