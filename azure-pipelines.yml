@@ -22,19 +22,11 @@ stages:
   - job: BuildJob
     displayName: 'Build'
     steps:
-    # - script: |
-    #     mkdir -p $(Build.ArtifactStagingDirectory)/project_files
-    #     cp -r https://github.com/AliFarooq0172/DevOpsProj/tree/main/src. $(Build.ArtifactStagingDirectory)/project_files/
-    #   displayName: 'Copy project files'
-    # - script: |
-    #     git clone https://github.com/AliFarooq0172/DevOpsProj.git
-    #     cp -r DevOpsProj/src $(Build.ArtifactStagingDirectory)/project_files/
-    #   displayName: 'Copy project files'
-    - checkout: self
-    - script: |
-        mkdir -p $(Build.ArtifactStagingDirectory)/project_files
-        cp -r $(Build.SourcesDirectory)/project_files/* $(Build.ArtifactStagingDirectory)/project_files/
-      displayName: 'Copy project files'
+    - task: CopyFiles@2
+      inputs:
+        Source: 'https://github.com/AliFarooq0172/DevOpsProj.git'
+        Contents: 'project_files/**'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/project_files'
     - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
@@ -43,4 +35,5 @@ stages:
       inputs:
         artifactName: 'html_artifact'
         publishLocation: 'pipeline'
+
 
