@@ -17,7 +17,7 @@
 # - task: PublishBuildArtifacts@1
 
 stages:
-- stage: Build
+- stage: Build #BUILD STAGE
   jobs:
   - job: BuildJob
     displayName: 'Build'
@@ -36,4 +36,19 @@ stages:
         artifactName: 'html_artifact'
         publishLocation: 'pipeline'
 
+- stage: Test  # SELENIUM TESTING STAGE
+  displayName: Test
+  jobs:
+  - job: RunSeleniumTests
+    displayName: Run Selenium Tests
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: SeleniumWebdriver@1
+      displayName: 'Run Selenium Tests'
+      inputs:
+        browser: 'chrome'
+        platform: 'Linux'
+        testFiles: '**/*.js'
+        options: '--headless'
 
