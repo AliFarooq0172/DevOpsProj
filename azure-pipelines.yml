@@ -26,9 +26,14 @@ stages:
     #     mkdir -p $(Build.ArtifactStagingDirectory)/project_files
     #     cp -r https://github.com/AliFarooq0172/DevOpsProj/tree/main/src. $(Build.ArtifactStagingDirectory)/project_files/
     #   displayName: 'Copy project files'
+    # - script: |
+    #     git clone https://github.com/AliFarooq0172/DevOpsProj.git
+    #     cp -r DevOpsProj/src $(Build.ArtifactStagingDirectory)/project_files/
+    #   displayName: 'Copy project files'
+    - checkout: self
     - script: |
-        git clone https://github.com/AliFarooq0172/DevOpsProj.git
-        cp -r DevOpsProj/src $(Build.ArtifactStagingDirectory)/project_files/
+        mkdir -p $(Build.ArtifactStagingDirectory)/project_files
+        cp -r $(Build.SourcesDirectory)/project_files/* $(Build.ArtifactStagingDirectory)/project_files/
       displayName: 'Copy project files'
     - task: ArchiveFiles@2
       inputs:
