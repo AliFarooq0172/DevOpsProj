@@ -77,7 +77,7 @@ stages:
                 $ie.Visible = $true
                 $ie.Navigate2('http://localhost')
 
-- stage: Release # RELEASE STAGE
+- stage: Release
   dependsOn: Test
   jobs:
   - deployment: DeployToDev
@@ -102,7 +102,6 @@ stages:
               script: |
                 Write-Host 'Deploying to Dev environment...'
                 # Run deployment scripts or commands here
-  # Add a pre-deployment approval gate
   - deployment: ApprovalGate
     displayName: 'Pre-Deployment Approval'
     dependsOn: DeployToDev
@@ -113,14 +112,11 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: PowerShell@2
+          - task: ManualIntervention@1
             displayName: 'Request Approval'
             inputs:
-              targetType: 'inline'
-              script: |
-                Write-Host 'Waiting for approval...'
-                # Run commands to request approval
-          - task: WaitForApproval@1
-            inputs:
-              timeoutInMinutes: 60
-              updateIntervalInSeconds: 30
+              instructions: 'Please approve this deployment.'
+              timeoutInMinutes: 1440 # 24 hours
+              notifyUsers: |
+                k190172@nu.edu.pk
+                k190145@nu.edu.pk
