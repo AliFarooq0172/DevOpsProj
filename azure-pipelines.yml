@@ -36,19 +36,39 @@ stages:
         artifactName: 'html_artifact'
         publishLocation: 'pipeline'
 
-- stage: Test  # SELENIUM TESTING STAGE
-  displayName: Test
+# - stage: Test  # SELENIUM TESTING STAGE
+#   displayName: Test
+#   jobs:
+#   - job: RunSeleniumTests
+#     displayName: Run Selenium Tests
+#     pool:
+#       vmImage: 'ubuntu-latest'
+#     steps:
+#     - task: SeleniumWebdriver@1
+#       displayName: 'Run Selenium Tests'
+#       inputs:
+#         browser: 'chrome'
+#         platform: 'Linux'
+#         testFiles: '**/*.js'
+#         options: '--headless'
+
+- stage: Test # LambdaTest #SELENIUM TESTING STAGE
+  displayName: 'Run Selenium Tests'
   jobs:
-  - job: RunSeleniumTests
-    displayName: Run Selenium Tests
+  - job: SeleniumTests
+    displayName: 'Selenium Tests'
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-    - task: SeleniumWebdriver@1
-      displayName: 'Run Selenium Tests'
+    - task: LambdaTestTaskV1@1
       inputs:
-        browser: 'chrome'
-        platform: 'Linux'
-        testFiles: '**/*.js'
-        options: '--headless'
-
+        LambdaTestConfigFile: '<path-to-LT-config-file>'
+        testFramework: 'selenium'
+        seleniumBrowser: 'chrome'
+        seleniumBrowserVersion: 'latest'
+        seleniumPlatform: 'Windows 10'
+        seleniumResolution: '1280x1024'
+        seleniumTunnel: true
+        SeleniumTestFiles: '**/*Tests.csproj'
+        LambdaTestUsername: '$(LambdaTestUsername)'
+        LambdaTestAccessKey: '$(LambdaTestAccessKey)'
