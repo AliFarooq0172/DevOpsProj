@@ -52,63 +52,24 @@ stages:
 #         testFiles: '**/*.js'
 #         options: '--headless'
 
-# - stage: Test # LambdaTest #SELENIUM TESTING STAGE
-#   displayName: 'Run Selenium Tests'
-#   jobs:
-#   - job: SeleniumTests
-#     displayName: 'Selenium Tests'
-#     pool:
-#       vmImage: 'ubuntu-latest'
-#     steps:
-#     - task: LambdaTestTaskV1@1
-#       inputs:
-#         LambdaTestConfigFile: '$(LT_CONFIG_FILE)'
-#         testFramework: 'selenium'
-#         seleniumBrowser: 'chrome'
-#         seleniumBrowserVersion: 'latest'
-#         seleniumPlatform: 'Windows 10'
-#         seleniumResolution: '1280x1024'
-#         seleniumTunnel: true
-#         SeleniumTestFiles: '**/*Tests.csproj'
-#         LambdaTestUsername: '$(LambdaTestUsername)'
-#         LambdaTestAccessKey: '$(LambdaTestAccessKey)'
-
-trigger:
-- main
-
-pool:
-  vmImage: 'ubuntu-latest'
-
-steps:
-- task: LambdaTestConfigurationSetup@1
-  displayName: 'Configure LambdaTest'
-  inputs:
-    accessKey: 'Sg1kfrXDCAguaaUkRC807SNtzC9gxqaeoddgxiFohWj1JrCVeu'
-    secretKey: '7ybxli5uowko2rzlj5excdagbvlpj5efika4ky6hxh6lg4tdoqvq'
-    username: 'k190172 Ali Farooq'
-    projectName: 'DevOpsProj'
-    # environmentName: '<your LambdaTest environment name>'
-    tunnel: 'LambdaTest'
-
-# - task: DownloadSecureFile@1
-#   displayName: 'Download LambdaTest Tunnel Binary'
-#   inputs:
-#     secureFile: '<your secure file containing LambdaTest tunnel binary>'
-
-- task: StartTunnel@1
-  displayName: 'Start LambdaTest Tunnel'
-  inputs:
-    tunnelBinaryPath: '$(DownloadSecureFile.secureFilePath)'
-    tunnelOptions: '-u $(LambdaTestConfigurationSetup.username) -k $(LambdaTestConfigurationSetup.accessKey) -s $(LambdaTestConfigurationSetup.secretKey) --tunnelName "$(LambdaTestConfigurationSetup.environmentName)"'
-
-- task: SeleniumWebdriver@1
+- stage: Test # LambdaTest #SELENIUM TESTING STAGE
   displayName: 'Run Selenium Tests'
-  inputs:
-    browser: 'chrome'
-    platform: 'Windows 10'
-    testFiles: '**/*.js'
-    options: '--headless'
-
-- task: StopTunnel@1
-  displayName: 'Stop LambdaTest Tunnel'
+  jobs:
+  - job: SeleniumTests
+    displayName: 'Selenium Tests'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: LambdaTestConfigurationSetup@1
+      inputs:
+        LambdaTestConfigFile: '$(LT_CONFIG_FILE)'
+        testFramework: 'selenium'
+        seleniumBrowser: 'chrome'
+        seleniumBrowserVersion: 'latest'
+        seleniumPlatform: 'Windows 10'
+        seleniumResolution: '1280x1024'
+        seleniumTunnel: true
+        SeleniumTestFiles: '**/*Tests.csproj'
+        LambdaTestUsername: '$(LambdaTestUsername)'
+        LambdaTestAccessKey: '$(LambdaTestAccessKey)'
 
