@@ -30,20 +30,6 @@ stages:
       inputs:
         packageType: 'sdk'
         version: '3.x'
-    # - task: NuGetToolInstaller@1
-    #   displayName: 'Install NuGet'
-    #   inputs:
-    #     versionSpec: '>= 5.0.0'
-    #     checkLatest: true
-    #   env:
-    #     nugetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
-    # - task: NuGetCommand@2
-    #   displayName: 'Restore packages'
-    #   inputs:
-    #     command: 'restore'
-    #     restoreSolution: '**/*.sln'
-    #     feedsToUse: 'config'
-    #     nugetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
     - task: VSTest@2
       displayName: 'Run Selenium Unit Tests'
       inputs:
@@ -54,3 +40,87 @@ stages:
         configuration: '$(buildConfiguration)'
         runInParallel: true
         codeCoverageEnabled: true
+  - deployment: DeployToStaging
+    displayName: 'Deploy to Staging Environment'
+    environment: 'Staging'
+    dependsOn: RunSeleniumTests
+    pool:
+      vmImage: 'windows-latest'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'html_artifact'
+              downloadPath: '$(System.ArtifactsDirectory)'
+          - task: PowerShell@2
+            displayName: 'Deploy to Staging Environment'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host 'Deploying to Staging environment...'
+
+                # Copy the HTML and CSS files to the web server's document root
+                Copy-Item -Path $(System.ArtifactsDirectory)/html_artifact/project_files -Destination C:\inetpub\wwwroot -Recurse
+
+                # Configure the web server to serve the HTML and CSS files
+                Add-Content -Path C:\inetpub\wwwroot\web.config -Value '<system.webServer><staticContent><mimeMap fileExtension=".html" mimeType="text/html" /><mimeMap fileExtension=".css" mimeType="text/css" /></staticContent></system.webServer>'
+
+                # Restart the web server to apply the configuration changes
+                Restart-Service -Name W3SVC
+
+                # Test the deployment by accessing the website using a web browser
+                $ie = New-Object -ComObject InternetExplorer.Application
+                $ie.Visible = $true
+                $ie.Navigate2('http://localhost')
+
+- stage: Release # RELEASE STAGE
+  dependsOn: Test
+  jobs:
+  - deployment: DeployToDev
+    displayName: 'Deploy to Dev Environment'
+    environment: 'Dev'
+    pool:
+      vmImage: 'windows-latest'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'html_artifact'
+              downloadPath: '$(System.ArtifactsDirectory)'
+          - task: PowerShell@2
+            displayName: 'Deploy to Dev Environment'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host 'Deploying to Dev environment...'
+                # Run deployment scripts or commands here
+  # Add a pre-deployment approval gate
+  - deployment: ApprovalGate
+    displayName: 'Pre-Deployment Approval'
+    dependsOn: DeployToDev
+    environment: 'Dev'
+    pool:
+      vmImage: 'windows-latest'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: PowerShell@2
+            displayName: 'Request Approval'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host 'Waiting for approval...'
+                # Run commands to request approval
+          - task: WaitForApproval@1
+            inputs:
+              timeoutInMinutes: 60
+              updateIntervalInSeconds: 30
