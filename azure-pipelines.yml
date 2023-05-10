@@ -30,20 +30,20 @@ stages:
       inputs:
         packageType: 'sdk'
         version: '3.x'
-    - task: NuGetToolInstaller@1
-      displayName: 'Install NuGet'
-      inputs:
-        versionSpec: '>= 5.0.0'
-        checkLatest: true
-      env:
-        nugetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
-    - task: NuGetCommand@2
-      displayName: 'Restore packages'
-      inputs:
-        command: 'restore'
-        restoreSolution: '**/*.sln'
-        feedsToUse: 'config'
-        nugetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
+    # - task: NuGetToolInstaller@1
+    #   displayName: 'Install NuGet'
+    #   inputs:
+    #     versionSpec: '>= 5.0.0'
+    #     checkLatest: true
+    #   env:
+    #     nugetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
+    # - task: NuGetCommand@2
+    #   displayName: 'Restore packages'
+    #   inputs:
+    #     command: 'restore'
+    #     restoreSolution: '**/*.sln'
+    #     feedsToUse: 'config'
+    #     nugetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
     - task: VSTest@2
       displayName: 'Run Selenium Unit Tests'
       inputs:
