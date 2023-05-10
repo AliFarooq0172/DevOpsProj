@@ -35,6 +35,8 @@ stages:
       inputs:
         versionSpec: '>= 5.0.0'
         checkLatest: true
+      env:
+        nugetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
     - task: NuGetCommand@2
       displayName: 'Restore packages'
       inputs:
