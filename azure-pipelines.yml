@@ -1,21 +1,3 @@
-# HTML
-# Archive your static HTML project and save it with the build record.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-# trigger:
-# - main
-
-# pool:
-#   vmImage: ubuntu-latest
-
-# steps:
-# - task: ArchiveFiles@2
-#   inputs:
-#     rootFolderOrFile: '$(build.sourcesDirectory)'
-#     includeRootFolder: false
-# - task: PublishBuildArtifacts@1
-
 stages:
 - stage: Build #BUILD STAGE
   jobs:
@@ -36,40 +18,37 @@ stages:
         artifactName: 'html_artifact'
         publishLocation: 'pipeline'
 
-# - stage: Test  # SELENIUM TESTING STAGE
-#   displayName: Test
-#   jobs:
-#   - job: RunSeleniumTests
-#     displayName: Run Selenium Tests
-#     pool:
-#       vmImage: 'ubuntu-latest'
-#     steps:
-#     - task: SeleniumWebdriver@1
-#       displayName: 'Run Selenium Tests'
-#       inputs:
-#         browser: 'chrome'
-#         platform: 'Linux'
-#         testFiles: '**/*.js'
-#         options: '--headless'
-
-- stage: Test # LambdaTest #SELENIUM TESTING STAGE
-  displayName: 'Run Selenium Tests'
+- stage: Test # SELENIUM TESTING STAGE
   jobs:
-  - job: SeleniumTests
-    displayName: 'Selenium Tests'
+  - job: RunSeleniumTests
+    displayName: 'Run Selenium Tests'
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: 'windows-latest'
     steps:
-    - task: LambdaTestConfigurationSetup@1
+    - task: UseDotNet@2
+      displayName: 'Install .NET Core SDK'
       inputs:
-        LambdaTestConfigFile: '$(LT_CONFIG_FILE)'
-        testFramework: 'selenium'
-        seleniumBrowser: 'chrome'
-        seleniumBrowserVersion: 'latest'
-        seleniumPlatform: 'Windows 10'
-        seleniumResolution: '1280x1024'
-        seleniumTunnel: true
-        SeleniumTestFiles: '**/*Tests.csproj'
-        LambdaTestUsername: '$(LambdaTestUsername)'
-        LambdaTestAccessKey: '$(LambdaTestAccessKey)'
-
+        packageType: 'sdk'
+        version: '3.x'
+    - task: NuGetToolInstaller@1
+      displayName: 'Install NuGet'
+      inputs:
+        versionSpec: '>= 5.0.0'
+        checkLatest: true
+    - task: NuGetCommand@2
+      displayName: 'Restore packages'
+      inputs:
+        command: 'restore'
+        restoreSolution: '**/*.sln'
+        feedsToUse: 'config'
+        nugetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
+    - task: VSTest@2
+      displayName: 'Run Selenium Unit Tests'
+      inputs:
+        testSelector: 'testAssemblies'
+        testAssemblyVer2: |
+          **/*UnitTests.dll
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+        runInParallel: true
+        codeCoverageEnabled: true
