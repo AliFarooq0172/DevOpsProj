@@ -25,9 +25,9 @@ stages:
     #     fetchDepth: 1
     - task: CopyFiles@2
       inputs:
-        SourceFolder: '$(System.DefaultWorkingDirectory)/project_files'
+        SourceFolder: '$(System.DefaultWorkingDirectory)/'
         Contents: '**'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)/project_files'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/'
     - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
@@ -90,4 +90,4 @@ stages:
         script: |
           Write-Host 'Deploying to Staging environment...'
           # Copy the HTML and CSS files to the web server's document root
-          Copy-Item -Path $(System.ArtifactsDirectory)/html_artifact/project_files -Destination C:\inetpub\wwwroot -Recurse
+          Copy-Item -Path $(System.ArtifactsDirectory)/html_artifact/ -Destination C:\inetpub\wwwroot -Recurse
