@@ -98,6 +98,10 @@ stages:
 
 - stage: Deploy #DEPLOY STAGE
   jobs:
+  - job: PrintMessage
+    displayName: 'Print Message'
+    steps:
+    - script: echo 'Deploying to production environment...'
   - deployment: DeployToProduction
     displayName: 'Deploy to Production Environment'
     environment: 'Production'
