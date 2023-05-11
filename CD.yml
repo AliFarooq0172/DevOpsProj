@@ -17,6 +17,17 @@ resources:
     name: AliFarooq0172/DevOpsProj
 
 stages:
+- stage: Build # BUILD STAGE
+  jobs:
+  - job: Build
+    displayName: 'Build'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - script: |
+        echo Building code...
+    # Add more steps to build your code
+
 - stage: Release # RELEASE STAGE
   dependsOn: Test
   jobs:
