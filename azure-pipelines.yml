@@ -12,7 +12,7 @@ stages:
           choco install git -y
     - task: Git@2
       inputs:
-        repository: 'https://github.com/AliFarooq0172/your-repo'
+        repository: 'https://github.com/AliFarooq0172/DevOpsProj'
         clean: true
         fetchDepth: 1
     - task: CopyFiles@2
