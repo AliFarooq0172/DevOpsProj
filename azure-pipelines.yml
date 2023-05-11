@@ -6,7 +6,7 @@ stages:
     steps:
     - task: CopyFiles@2
       inputs:
-        SourceFolder: 'https://github.com/AliFarooq0172/DevOpsProj.git'
+        SourceFolder: 'https://github.com/AliFarooq0172/'
         # Source: 
         Contents: 'project_files/**'
         TargetFolder: '$(Build.ArtifactStagingDirectory)/project_files'
