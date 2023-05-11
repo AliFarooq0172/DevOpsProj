@@ -13,6 +13,12 @@ stages:
       inputs:
         rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
         includeRootFolder: true
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/html_artifact.zip'
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: 'html_artifact'
+        targetPath: '$(Build.ArtifactStagingDirectory)/html_artifact.zip'
     - task: PublishBuildArtifacts@1
       inputs:
         artifactName: 'html_artifact'
