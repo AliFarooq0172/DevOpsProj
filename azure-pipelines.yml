@@ -108,4 +108,4 @@ stages:
         CleanTargetFolder: true
         Overwrite: true
       script: './deploy.sh'
-      # displayName: 'Execute deployment script'
+      displayName: 'Execute deployment script'
