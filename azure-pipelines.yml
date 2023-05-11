@@ -1,3 +1,9 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
 stages:
 - stage: Build
   jobs:
@@ -29,6 +35,7 @@ stages:
         artifactName: 'html_artifact'
         pathToPublish: '$(Build.ArtifactStagingDirectory)/html_artifact.zip'
         publishLocation: 'pipeline'
+        
 - stage: Test
   jobs:
   - job: RunSeleniumTests
@@ -51,61 +58,28 @@ stages:
         configuration: '$(buildConfiguration)'
         runInParallel: true
         codeCoverageEnabled: true
+        
   - job: DeployToStaging
     displayName: 'Deploy to Staging Environment'
-    environment: 'Staging'
+    environment:
+      name: 'Staging'
+      resourceType: 'VirtualMachine'
+      tags: 'Environment=Staging'
     dependsOn: RunSeleniumTests
     pool:
       vmImage: 'windows-latest'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: DownloadBuildArtifacts@0
-            inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'html_artifact'
-              downloadPath: '$(System.ArtifactsDirectory)'
-          - task: PowerShell@2
-            displayName: 'Deploy to Staging Environment'
-            inputs:
-              targetType: 'inline'
-              script: |
-                Write-Host 'Deploying to Staging environment...'
-                # Copy the HTML and CSS files to the web server's document root
-                Copy-Item -Path $(System.ArtifactsDirectory)/html_artifact/project_files -Destination C:\inetpub\wwwroot -Recurse
-                # Configure the web server to serve the HTML and CSS files
-                Add-Content C:\inetpub\wwwroot\web.config @'
-                <system.webServer>
-                  <staticContent>
-                    <mimeMap fileExtension=".html" mimeType="text/html" />
-                    <mimeMap fileExtension=".css" mimeType="text/css" />
-                  </staticContent>
-                </system.webServer>
-                '@
-                
-- stage: DeployToProd
-  displayName: 'Deploy to Production'
-  dependsOn: DeployToStaging
-  condition: succeeded()
-  jobs:
-  - job: DeployToProd
-    displayName: 'Deploy to Production Environment'
-    environment:
-      name: 'Production'
-      resourceType: 'VirtualMachine'
-      tags: 'Environment=Production'
-    pool:
-      name: 'ProdVM'
     steps:
-    - task: CopyFiles@2
-      displayName: 'Copy files to production server'
+    - task: DownloadBuildArtifacts@0
       inputs:
-        SourceFolder: '$(build.artifactstagingdirectory)'
-        Contents: '**'
-        TargetFolder: '/var/www/myapp'
-        CleanTargetFolder: true
-        Overwrite: true
-      script: './deploy.sh'
-      # displayName: 'Execute deployment script'
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'html_artifact'
+        downloadPath: '$(System.ArtifactsDirectory)'
+    - task: PowerShell@2
+      displayName: 'Deploy to Staging Environment'
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host 'Deploying to Staging environment...'
+          # Copy the HTML and CSS files to the web server's document root
+          Copy-Item -Path $(System.ArtifactsDirectory)/html_artifact/project_files -Destination C:\inetpub\wwwroot -Recurse
