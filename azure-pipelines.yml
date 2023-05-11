@@ -16,6 +16,7 @@ stages:
     - task: PublishBuildArtifacts@1
       inputs:
         artifactName: 'html_artifact'
+        pathToPublish: '$(Build.ArtifactStagingDirectory)/html_artifact.zip'
         publishLocation: 'pipeline'
 
 - stage: Test # SELENIUM TESTING STAGE
