@@ -6,7 +6,8 @@ stages:
     steps:
     - task: CopyFiles@2
       inputs:
-        Source: 'https://github.com/AliFarooq0172/DevOpsProj.git'
+        SourceFolder: 'https://github.com/AliFarooq0172/DevOpsProj.git'
+        # Source: 
         Contents: 'project_files/**'
         TargetFolder: '$(Build.ArtifactStagingDirectory)/project_files'
     - task: ArchiveFiles@2
@@ -126,8 +127,8 @@ stages:
               timeoutInMinutes: 60
               onTimeout: 'reject'
               notifyUsers: |
-                john.doe@contoso.com
-                jane.doe@contoso.com
+                k190172@nu.edu.pk
+                k190145@nu.edu.pk
               # timeoutInMinutes: 60
               # onTimeout: reject
               # emailRecipients: |
