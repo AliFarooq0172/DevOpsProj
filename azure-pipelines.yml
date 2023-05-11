@@ -4,17 +4,25 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
+resources:
+  repositories:
+  - repository: DevOpsProj
+    type: github
+    endpoint: MyGitHubServiceConnection
+    name: AliFarooq0172/DevOpsProj
+
+
 stages:
 - stage: Build
   jobs:
   - job: BuildJob
     displayName: 'Build'
     steps:
-    - task: GitCheckout@2
-      inputs:
-        repository: 'https://github.com/AliFarooq0172/DevOpsProj'
-        clean: true
-        fetchDepth: 1
+    # - task: GitCheckout@2
+    #   inputs:
+    #     repository: 'https://github.com/AliFarooq0172/DevOpsProj'
+    #     clean: true
+    #     fetchDepth: 1
     - task: CopyFiles@2
       inputs:
         SourceFolder: '$(System.DefaultWorkingDirectory)/project_files'
