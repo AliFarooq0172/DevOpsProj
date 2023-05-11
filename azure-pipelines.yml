@@ -83,11 +83,11 @@ stages:
         downloadType: 'single'
         artifactName: 'html_artifact'
         downloadPath: '$(System.ArtifactsDirectory)'
-    - task: PowerShell@2
-      displayName: 'Deploy to Staging Environment'
-      inputs:
-        targetType: 'inline'
-        script: |
-          Write-Host 'Deploying to Staging environment...'
-          # Copy the HTML and CSS files to the web server's document root
-          Copy-Item -Path $(System.ArtifactsDirectory)/html_artifact/ -Destination C:\inetpub\wwwroot -Recurse
+    # - task: PowerShell@2
+    #   displayName: 'Deploy to Staging Environment'
+    #   inputs:
+    #     targetType: 'inline'
+    #     script: |
+    #       Write-Host 'Deploying to Staging environment...'
+    #       # Copy the HTML and CSS files to the web server's document root
+    #       Copy-Item -Path $(System.ArtifactsDirectory)/html_artifact/ -Destination C:\inetpub\wwwroot -Recurse
