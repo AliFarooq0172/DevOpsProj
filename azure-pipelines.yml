@@ -4,11 +4,15 @@ stages:
   - job: BuildJob
     displayName: 'Build'
     steps:
+    - task: Git@2
+      inputs:
+        repository: 'https://github.com/AliFarooq0172/your-repo'
+        clean: true
+        fetchDepth: 1
     - task: CopyFiles@2
       inputs:
-        SourceFolder: 'https://github.com/AliFarooq0172/'
-        # Source: 
-        Contents: 'project_files/**'
+        SourceFolder: '$(System.DefaultWorkingDirectory)/project_files'
+        Contents: '**'
         TargetFolder: '$(Build.ArtifactStagingDirectory)/project_files'
     - task: ArchiveFiles@2
       inputs:
@@ -75,22 +79,23 @@ stages:
                 Copy-Item -Path $(System.ArtifactsDirectory)/html_artifact/project_files -Destination C:\inetpub\wwwroot -Recurse
 
                 # Configure the web server to serve the HTML and CSS files
-                Add-Content -Path C:\inetpub\wwwroot\web.config -Value '<system.webServer><staticContent><mimeMap fileExtension=".html" mimeType="text/html" /><mimeMap fileExtension=".css" mimeType="text/css" /></staticContent></system.webServer>'
+                Add-Content C:\inetpub\wwwroot\web.config @'
+                <system.webServer>
+                  <staticContent>
+                    <mimeMap fileExtension=".css" mimeType="text/css" />
+                  </staticContent>
+                </system.webServer>
+                '@
 
-                # Restart the web server to apply the configuration changes
-                Restart-Service -Name W3SVC
+                # Restart the web server to pick up the changes
+                Restart-Service W3SVC
 
-                # Test the deployment by accessing the website using a web browser
-                $ie = New-Object -ComObject InternetExplorer.Application
-                $ie.Visible = $true
-                $ie.Navigate2('http://localhost')
-
-- stage: Release
-  dependsOn: Test
+- stage: Deploy #DEPLOY STAGE
   jobs:
-  - deployment: DeployToDev
-    displayName: 'Deploy to Dev Environment'
-    environment: 'Dev'
+  - deployment: DeployToProduction
+    displayName: 'Deploy to Production Environment'
+    environment: 'Production'
+    dependsOn: DeployToStaging
     pool:
       vmImage: 'windows-latest'
     strategy:
@@ -104,34 +109,23 @@ stages:
               artifactName: 'html_artifact'
               downloadPath: '$(System.ArtifactsDirectory)'
           - task: PowerShell@2
-            displayName: 'Deploy to Dev Environment'
+            displayName: 'Deploy to Production Environment'
             inputs:
               targetType: 'inline'
               script: |
-                Write-Host 'Deploying to Dev environment...'
-                # Run deployment scripts or commands here
-  - deployment: ApprovalGate
-    displayName: 'Pre-Deployment Approval'
-    dependsOn: DeployToDev
-    environment: 'Dev'
-    pool:
-      vmImage: 'windows-latest'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: ManualIntervention@6
-            displayName: 'Request Approval'
-            inputs:
-              instructions: 'Please approve this deployment.'
-              timeoutInMinutes: 60
-              onTimeout: 'reject'
-              notifyUsers: |
-                k190172@nu.edu.pk
-                k190145@nu.edu.pk
-              # timeoutInMinutes: 60
-              # onTimeout: reject
-              # emailRecipients: |
-              #   k190172@nu.edu.pk
-              #   k190145@nu.edu.pk
-              
+                Write-Host 'Deploying to Production environment...'
+                
+                # Copy the HTML and CSS files to the web server's document root
+                Copy-Item -Path $(System.ArtifactsDirectory)/html_artifact/project_files -Destination C:\inetpub\wwwroot -Recurse
+
+                # Configure the web server to serve the HTML and CSS files
+                Add-Content C:\inetpub\wwwroot\web.config @'
+                <system.webServer>
+                  <staticContent>
+                    <mimeMap fileExtension=".css" mimeType="text/css" />
+                  </staticContent>
+                </system.webServer>
+                '@
+
+                # Restart the web server to pick up the changes
+                Restart-Service W3SVC
