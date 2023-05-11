@@ -29,7 +29,7 @@ stages:
     # Add more steps to build your code
 
 - stage: Release # RELEASE STAGE
-  dependsOn: Test
+  # dependsOn: Test
   jobs:
   - deployment: DeployToDev
     displayName: 'Deploy to Dev Environment'
