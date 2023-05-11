@@ -61,10 +61,10 @@ stages:
         
   - job: DeployToStaging
     displayName: 'Deploy to Staging Environment'
-    environment:
-      name: 'Staging'
-      resourceType: 'VirtualMachine'
-      tags: 'Environment=Staging'
+    # environment:
+    #   name: 'Staging'
+    #   resourceType: 'VirtualMachine'
+    #   tags: 'Environment=Staging'
     dependsOn: RunSeleniumTests
     pool:
       vmImage: 'windows-latest'
