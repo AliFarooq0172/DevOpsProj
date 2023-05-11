@@ -4,6 +4,12 @@ stages:
   - job: BuildJob
     displayName: 'Build'
     steps:
+    - task: PowerShell@2
+      displayName: 'Install Git'
+      inputs:
+        targetType: 'inline'
+        script: |
+          choco install git -y
     - task: Git@2
       inputs:
         repository: 'https://github.com/AliFarooq0172/your-repo'
@@ -114,7 +120,7 @@ stages:
               targetType: 'inline'
               script: |
                 Write-Host 'Deploying to Production environment...'
-                
+
                 # Copy the HTML and CSS files to the web server's document root
                 Copy-Item -Path $(System.ArtifactsDirectory)/html_artifact/project_files -Destination C:\inetpub\wwwroot -Recurse
 
